@@ -74,7 +74,7 @@ func newServerInfo() *serverInfo {
 func main() {
 	tick := time.Tick(heartBeatPeriod)
 	for {
-		<-tick
 		heartBeat()
+		<-tick
 	}
 }
