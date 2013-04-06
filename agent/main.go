@@ -21,6 +21,9 @@ const (
 	heartBeatPeriod = time.Second * 30       // XXX
 	waitTime        = time.Second * 30
 	debug           = true
+
+	// For occasional, also serves to prevent the execution of multiple agents.
+	httpServerPort = 9999
 )
 
 func heartBeat() {
@@ -72,6 +75,12 @@ func newServerInfo() *serverInfo {
 }
 
 func main() {
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", httpServerPort, nil))
+		if err != nil {
+			log.Fatal("could not start http server, check that no other agent is running %v", err)
+		}
+	}()
 	tick := time.Tick(heartBeatPeriod)
 	for {
 		heartBeat()

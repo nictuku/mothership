@@ -1,4 +1,4 @@
-A web page that lists my servers.
+A web page that lists my servers. It also serves a static files from $HOME/www.
 
 Missing features:
 - authentication
