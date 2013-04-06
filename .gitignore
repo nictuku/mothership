@@ -1,2 +1,4 @@
 agent/agent
-agent/agent.exe
+agent/*.exe
+mothership/mothersip
+mothership/*.exe

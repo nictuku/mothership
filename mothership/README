@@ -1,0 +1,13 @@
+A web page that lists my servers.
+
+Missing features:
+- authentication
+- per-user data
+- persistence
+
+==
+How to run on port 80:
+
+$ go build
+$ sudo setcap 'cap_net_bind_service=+ep' mothership
+$ ./mothership
