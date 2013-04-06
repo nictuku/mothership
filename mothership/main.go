@@ -8,6 +8,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
@@ -89,10 +91,29 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func wwwDir() string {
+	home := os.Getenv("HOME")
+	if home == "" {
+		home = string(filepath.Separator)
+	}
+	dir := filepath.Join(home, "www")
+	return dir
+}
+
 func main() {
 	flag.Parse()
 	index = template.Must(template.New("index").Parse(indexTemplate))
 	servers = &serversInfo{Info: map[string]ServerInfo{}}
 	http.HandleFunc("/", indexHandler)
-	http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
+	log.Println("Serving mothership index at /")
+
+	dir := wwwDir()
+	http.Handle("/static", http.FileServer(http.Dir(dir)))
+	log.Printf("Serving static files from %v at /static", dir)
+
+	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
+
+	if err != nil {
+		log.Println("Error starting www server:", err)
+	}
 }
