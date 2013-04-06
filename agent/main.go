@@ -1,10 +1,9 @@
 // agent is a program that frequently streams their status to a central
-// server. 
+// server.
 //
-// My goal is to have a web page that lists all my servers, gives me a
-// link to their SSH port and indicates if a server isn't running anymore.
-// This is the small agent that runs on each server and routinely contacts the
-// mothership.
+// My goal is to have a web page that lists all my servers, gives me a link to
+// their SSH port and indicates if a server isn't running anymore. This is the
+// small agent that runs on each server and routinely contacts the mothership. 
 package main
 
 import (
@@ -18,8 +17,8 @@ import (
 )
 
 const (
-	heartBeatURL    = "http://1.a.magnets.im/" // XXX
-	heartBeatPeriod = time.Second * 5          // XXX
+	heartBeatURL    = "http://geekroot.com/" // XXX
+	heartBeatPeriod = time.Second * 30       // XXX
 	waitTime        = time.Second * 30
 	debug           = true
 )
