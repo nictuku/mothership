@@ -1,5 +1,5 @@
 agent/agent
 agent/*.exe
-mothership/mothersip
+mothership/mothership
 mothership/*.exe
 login/login_config.go

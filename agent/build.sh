@@ -12,3 +12,4 @@ export GOARCH=amd64
 go build
 cp agent ~/www/Linux/x86_64
 
+chmod a+rx ~/www/Linux -R
