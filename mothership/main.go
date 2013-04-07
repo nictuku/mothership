@@ -60,6 +60,11 @@ type serversInfo struct {
 var servers *serversInfo
 
 func indexHandler(w http.ResponseWriter, req *http.Request) {
+	if req.URL.Path != "/" {
+		log.Printf("unknown path %v", req.URL.Path)
+		http.NotFound(w, req)
+		return
+	}
 	servers.Lock()
 	defer servers.Unlock()
 	hostname := req.FormValue("hostname")
