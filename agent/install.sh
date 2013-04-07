@@ -4,7 +4,7 @@ set -eu
 
 mkdir -p $HOME/myservers
 cd $HOME/myservers
-curl -sLO http://geekroot.com/static/agent
+curl -sLO http://geekroot.com/static/$(uname -s)/$(uname -m)/agent
 chmod 700 agent
 cat <<"EOF"> run.sh
 nohup ./agent 2> /dev/null &
