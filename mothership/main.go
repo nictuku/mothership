@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	port = flag.Int("port", 8080, "Port on which to run the web server.")
+	port = flag.Int("port", 80, "Port on which to run the web server.")
 )
 
 const (
