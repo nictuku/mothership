@@ -1,0 +1,10 @@
+package login
+
+import "bitbucket.org/gosimple/oauth2"
+
+var ghService = oauth2.Service(
+	clientId,
+	clientSecret,
+	"https://github.com/login/oauth/authorize",
+	"https://github.com/login/oauth/access_token",
+)

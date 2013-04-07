@@ -2,3 +2,4 @@ agent/agent
 agent/*.exe
 mothership/mothersip
 mothership/*.exe
+login/login_config.go

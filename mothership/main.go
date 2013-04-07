@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/nictuku/myservers/login"
 )
 
 var (
@@ -68,6 +70,8 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	servers.Lock()
 	defer servers.Unlock()
 	hostname := req.FormValue("hostname")
+
+	// TODO: Make a separate handler for the heartbeats.
 	if hostname != "" {
 		s := ServerInfo{
 			Hostname:    hostname,
@@ -83,14 +87,25 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		if ip, _, err := net.SplitHostPort(req.RemoteAddr); err == nil && ip != "" {
 			s.IP = ip
 		}
-
+		// TODO: ensure that a rogue HTTP client can't override legitimate entries.
 		servers.Info[s.Hostname] = s
 		log.Println("updated server", s.Hostname)
 		io.WriteString(w, "ok")
 		return
 	}
 
-	err := index.Execute(w, servers.Info)
+	passport, err := login.CurrentPassport(req)
+	if err != nil {
+		log.Println("Redirecting to ghlogin. Referrer was:", req.Referer())
+		http.Redirect(w, req, "/ghlogin", http.StatusFound)
+		return
+	}
+	if passport.Email != "yves.junqueira@gmail.com" {
+		http.Error(w, "Nope.", http.StatusForbidden)
+		return
+	}
+
+	err = index.Execute(w, servers.Info)
 	if err != nil {
 		log.Println(err)
 	}
