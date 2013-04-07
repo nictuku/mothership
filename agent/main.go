@@ -3,10 +3,11 @@
 //
 // My goal is to have a web page that lists all my servers, gives me a link to
 // their SSH port and indicates if a server isn't running anymore. This is the
-// small agent that runs on each server and routinely contacts the mothership. 
+// small agent that runs on each server and routinely contacts the mothership.
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -76,9 +77,9 @@ func newServerInfo() *serverInfo {
 
 func main() {
 	go func() {
-		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", httpServerPort, nil))
+		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", httpServerPort), nil)
 		if err != nil {
-			log.Fatal("could not start http server, check that no other agent is running %v", err)
+			log.Fatal("could not start http server, check that no other agent is running: ", err)
 		}
 	}()
 	tick := time.Tick(heartBeatPeriod)
