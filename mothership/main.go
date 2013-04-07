@@ -116,9 +116,11 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 	log.Printf("Serving static files from %v at /static", dir)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
-
-	if err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil); err != nil {
 		log.Println("Error starting www server:", err)
+		// os.IsPermission(err) doesn't work.
+		if *port == 80 {
+			log.Printf("Try: sudo setcap 'cap_net_bind_service=+ep' %v", os.Args[0])
+		}
 	}
 }
