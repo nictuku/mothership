@@ -113,7 +113,7 @@ func main() {
 	log.Println("Serving mothership index at /")
 
 	dir := wwwDir()
-	http.Handle("/static", http.FileServer(http.Dir(dir)))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 	log.Printf("Serving static files from %v at /static", dir)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
