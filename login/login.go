@@ -8,7 +8,6 @@ package login
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"log"

@@ -35,7 +35,7 @@ const indexTemplate = `
 	<table>
 	<th>hostname</th><th>IP</th><th>Last seen</th>
 	{{range .}}
-	<tr><td><a href="ssh://{{ if .Username }}{{.Username}}@{{ end }}{{.IP}}:{{.SSHPort}}">{{.Hostname}}</a></td><td>{{.IP}}</td><td>{{.LastContact}}</td></tr>
+	<tr><td><a href="ssh://{{ if .Username }}{{.Username}}@{{ end }}{{.IP}}:{{.SSHPort}}">{{.Hostname}}</a></td><td>{{.IP}}</td><td>{{with .Since}}{{.}} ago. {{end}}</td></tr>
 	{{end}}
 	</table>
 </body>
@@ -53,7 +53,10 @@ type ServerInfo struct {
 	LastContact time.Time
 }
 
-// XXX lock.
+func (s ServerInfo) Since() time.Duration {
+	return time.Since(s.LastContact)
+}
+
 type serversInfo struct {
 	sync.RWMutex
 	Info map[string]ServerInfo
