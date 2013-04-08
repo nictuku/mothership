@@ -1,7 +1,9 @@
-myservers
+Mothership
 =========
 
-A web page that lists all my servers, gives me a link to their SSH port and indicates if a server isn't running anymore.
+A zero configuration web service that holds recent status updates from my servers.
+
+It has a single web page that lists servers, gives me a link to their SSH port and indicates if a server isn't running anymore.
 
 Agent installation:
 
