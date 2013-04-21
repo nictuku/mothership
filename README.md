@@ -8,5 +8,5 @@ It has a single web page that lists servers, gives me a link to their SSH port a
 Agent installation:
 
 ```
-curl -sL https://raw.github.com/nictuku/myservers/master/agent/install.sh | bash -x
+curl -sL https://raw.github.com/nictuku/mothership/master/agent/install.sh | bash -x
 ```
