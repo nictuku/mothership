@@ -99,7 +99,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 	passport, err := login.CurrentPassport(req)
 	if err != nil {
-		log.Println("Redirecting to ghlogin. Referrer was:", req.Referer())
+		log.Println("Redirecting to ghlogin, %q. Referrer was:", err, req.Referer())
 		http.Redirect(w, req, "/ghlogin", http.StatusFound)
 		return
 	}
