@@ -1,6 +1,5 @@
-// Basic usage:
-// How to use: call CurrentPassport(). If it returns an error and the referrer is not
-// ourselves, redirect the user to /ghlogin.
+// package login provides a simplified login mechanism that uses GitHub authentication.
+// See the documentation for CurrentPassword for how to use.
 package login
 
 // TODO: clean this up.
@@ -18,10 +17,14 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// OAuth2CallBack is the URL path used by GitHub to redirect users after an
+// authentication attempt. It must match the path used in the GitHub API client
+// registration.
+const OAuth2CallBack = "/oauth2callback"
+
 func init() {
 	http.HandleFunc("/ghlogin", handleAuthorize)
-	// This must match the callback in the client registration.
-	http.HandleFunc("/oauth2callback", handleAuthToken)
+	http.HandleFunc(OAuth2CallBack, handleAuthToken)
 }
 
 // TODO: key rotation based on time, for stability after server restarts.
@@ -32,6 +35,10 @@ type Passport struct {
 	Email      string `email`
 }
 
+// CurrentPassword inspects cookies and finds if the user has been authenticated already. If so, the
+// user details are returned in Password - otherwise an error is provided. After receiving an error,
+// callers should confirm that the referrer is not their own application, then redirect the user to
+// /ghlogin which will show a login form.
 func CurrentPassport(r *http.Request) (*Passport, error) {
 	session, _ := cookies.Get(r, "userauth")
 	email, ok := session.Values["email"].(string)
