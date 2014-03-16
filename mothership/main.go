@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nictuku/myservers/login"
+	"github.com/nictuku/mothership/login"
 )
 
 var (
