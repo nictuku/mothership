@@ -1,13 +1,31 @@
-A web page that lists my servers. It also serves a static files from $HOME/www.
+A web page that lists my servers.
 
-Missing features:
+Features
+--------
+- server monitoring dashboard
+- pushover notifications of missing servers
+- serves static files from $HOME/www
+
+Missing features
+----------------
 - authentication
 - per-user data
 - persistence
 
-==
-How to run on port 80:
+How to run on port 80
+----------------------
 
-$ go build
-$ sudo setcap 'cap_net_bind_service=+ep' mothership
-$ ./mothership
+  $ go build
+  $ sudo setcap 'cap_net_bind_service=+ep' mothership
+  $ ./mothership
+
+Missing host notification
+-------------------------
+If a server goes missing for a certain time, it sends a notification via pushover.
+
+Missing host notification configuration
+---------------------------------------
+    {
+            "PushoverKey": "key",
+            "PushoverDestination": "destination"
+    }
