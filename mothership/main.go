@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/nictuku/mothership/login"
 )
 
@@ -127,7 +128,7 @@ func main() {
 	flag.Parse()
 	index = template.Must(template.New("index").Parse(indexTemplate))
 	servers = &serversInfo{Info: map[string]ServerInfo{}}
-	http.HandleFunc("/", indexHandler)
+	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, http.HandlerFunc(indexHandler)))
 	log.Println("Serving mothership index at /")
 
 	dir := wwwDir()
