@@ -25,7 +25,13 @@ If a server goes missing for a certain time, it sends a notification via pushove
 
 Missing host notification configuration
 ---------------------------------------
-    {
-            "PushoverKey": "key",
-            "PushoverDestination": "destination"
-    }
+  {
+    "PushoverKey": "pushkey",
+    "Users": [
+      {
+        "Email": "yves.junqueira@gmail.com",
+        "PushoverDestination": "pushoverdestin"
+      }
+    ]
+  }
+  

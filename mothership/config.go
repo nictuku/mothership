@@ -34,7 +34,12 @@ func confPath() string {
 }
 
 type Config struct {
-	PushoverKey         string
+	PushoverKey string
+	Users       []User
+}
+
+type User struct {
+	Email               string
 	PushoverDestination string
 }
 
