@@ -1,4 +1,4 @@
-package main
+package cfg
 
 import (
 	"encoding/json"
@@ -43,9 +43,9 @@ type User struct {
 	PushoverDestination string
 }
 
-// readConfig reads the mothership configuration from $HOME/.mothership/mothership.json and returns
+// ReadConfig reads the mothership configuration from $HOME/.mothership/mothership.json and returns
 // the parsed Config.
-func readConf() (cfg Config, err error) {
+func ReadConf() (cfg Config, err error) {
 	file, err := os.Open(confPath())
 	if err != nil {
 		return cfg, err
