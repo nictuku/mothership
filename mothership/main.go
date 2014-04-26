@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/nictuku/mothership/cfg"
 	"github.com/nictuku/mothership/login"
 )
 
@@ -104,7 +105,14 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/ghlogin", http.StatusFound)
 		return
 	}
-	if passport.Email != "yves.junqueira@gmail.com" {
+	// TODO: Improve the user lookup.
+	foundUser := false
+	for _, user := range config.Users {
+		if user.Email == passport.Email {
+			foundUser = true
+		}
+	}
+	if !foundUser {
 		http.Error(w, "Nope.", http.StatusForbidden)
 		return
 	}
@@ -124,8 +132,17 @@ func wwwDir() string {
 	return dir
 }
 
+var config cfg.Config
+
 func main() {
 	flag.Parse()
+
+	var err error
+	if config, err = cfg.ReadConf(); err != nil {
+		log.Printf("ReadConf: %v", err)
+		os.Exit(1)
+	}
+
 	index = template.Must(template.New("index").Parse(indexTemplate))
 	servers = &serversInfo{Info: map[string]ServerInfo{}}
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, http.HandlerFunc(indexHandler)))
