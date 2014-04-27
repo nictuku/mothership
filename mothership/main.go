@@ -123,6 +123,25 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// staleCheck looks for hosts that didn't contact us in a while and sends an alert for them.
+func staleCheck() {
+	// TODO: Per-user hosts database.
+	c := time.Tick(5 * time.Minute)
+
+	for now := range c {
+		servers.Lock()
+		defer servers.Unlock()
+		for _, server := range servers.Info {
+			if now.Sub(server.LastContact) > 10*time.Minute {
+				// TODO: Alert the right user.
+				user := config.Users[0]
+				fmt.Println("pushover", user.PushoverDestination)
+			}
+		}
+	}
+
+}
+
 func wwwDir() string {
 	home := os.Getenv("HOME")
 	if home == "" {
@@ -145,6 +164,9 @@ func main() {
 
 	index = template.Must(template.New("index").Parse(indexTemplate))
 	servers = &serversInfo{Info: map[string]ServerInfo{}}
+
+	go staleCheck()
+
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, http.HandlerFunc(indexHandler)))
 	log.Println("Serving mothership index at /")
 
