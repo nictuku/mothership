@@ -130,7 +130,6 @@ func staleCheck() {
 
 	for now := range c {
 		servers.Lock()
-		defer servers.Unlock()
 		for _, server := range servers.Info {
 			if now.Sub(server.LastContact) > 10*time.Minute {
 				// TODO: Alert the right user.
@@ -138,6 +137,7 @@ func staleCheck() {
 				fmt.Println("pushover", user.PushoverDestination)
 			}
 		}
+		servers.Unlock()
 	}
 
 }
