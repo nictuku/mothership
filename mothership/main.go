@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"bitbucket.org/kisom/gopush/pushover"
 	"github.com/gorilla/handlers"
 	"github.com/nictuku/mothership/cfg"
 	"github.com/nictuku/mothership/login"
@@ -127,19 +128,38 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 func staleCheck() {
 	// TODO: Per-user hosts database.
 	c := time.Tick(5 * time.Minute)
-
+	notified := make(map[string]bool)
 	for now := range c {
 		servers.Lock()
 		for _, server := range servers.Info {
 			if now.Sub(server.LastContact) > 10*time.Minute {
+				if notified[server.Hostname] {
+					continue
+				}
 				// TODO: Alert the right user.
 				user := config.Users[0]
-				fmt.Println("pushover", user.PushoverDestination)
+				err := notify(user.PushoverDestination, fmt.Sprintf("Mothership: %q not seen for %v", server.Hostname, time.Since(server.LastContact)))
+				if err != nil {
+					fmt.Printf("Pushover notification error about host %q: %v\n", server.Hostname, err)
+					continue
+				}
+				notified[server.Hostname] = true
+				continue
 			}
+			notified[server.Hostname] = false
 		}
 		servers.Unlock()
 	}
 
+}
+
+func notify(destination, message string) error {
+	// TODO: cache this.
+	pushauth := pushover.Authenticate(config.PushoverKey, destination)
+	if !pushover.Notify(pushauth, message) {
+		return fmt.Errorf("pushover notification failed.")
+	}
+	return nil
 }
 
 func wwwDir() string {
