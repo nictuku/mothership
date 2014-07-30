@@ -48,8 +48,17 @@ func CurrentPassport(r *http.Request) (*Passport, error) {
 	return &Passport{Authorized: true, Email: email}, nil
 }
 
+// Service should be overridden by the client library. It can't be used
+// concurrently therefore it should be set during program initialization, or
+// sometime before it's used.
+var Service *oauth2.OAuth2Service
+
 func handleAuthorize(w http.ResponseWriter, r *http.Request) {
-	url := ghService.GetAuthorizeURL("")
+	if Service == nil {
+		http.Error(w, "Passport service not configured", http.StatusInternalServerError)
+		return
+	}
+	url := Service.GetAuthorizeURL("")
 	http.Redirect(w, r, url, http.StatusFound)
 }
 
@@ -60,7 +69,11 @@ const (
 
 func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
-	token, err := ghService.GetAccessToken(code)
+	if Service == nil {
+		http.Error(w, "Passport service not configured", http.StatusInternalServerError)
+		return
+	}
+	token, err := Service.GetAccessToken(code)
 	if err != nil {
 		log.Printf("service token err %v, code %v", err, code)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
