@@ -39,6 +39,10 @@ type Passport struct {
 // user details are returned in Password - otherwise an error is provided. After receiving an error,
 // callers should confirm that the referrer is not their own application, then redirect the user to
 // /ghlogin which will show a login form.
+//
+// The page generating the /ghlogin redirect can store a cookie called "ref" with the current URL
+// path as the value. After login is authenticated, we'll inspect the ref cookie and direct the user
+// back there.
 func CurrentPassport(r *http.Request) (*Passport, error) {
 	session, _ := cookies.Get(r, "userauth")
 	email, ok := session.Values["email"].(string)
@@ -102,8 +106,14 @@ func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 		session.Save(r, w)
 	}
 
-	// TODO: Store the target URL for the redirect in a cookie, set by /ghlogin.
-	http.Redirect(w, r, "/", http.StatusFound)
+	redirectTo := "/"
+	cookie, err := r.Cookie("ref")
+	if err == nil {
+		redirectTo = cookie.Value
+	}
+	log.Printf("Redirecting back to %v", redirectTo)
+	http.Redirect(w, r, redirectTo, http.StatusFound)
+
 	return
 }
 
