@@ -12,9 +12,9 @@ import (
 	"log"
 	"net/http"
 
-	"bitbucket.org/gosimple/oauth2"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"golang.org/x/oauth2"
 )
 
 // OAuth2CallBack is the URL path used by GitHub to redirect users after an
@@ -42,7 +42,7 @@ type Passport struct {
 //
 // The page generating the /ghlogin redirect can store a cookie called "ref" with the current URL
 // path as the value. After login is authenticated, we'll inspect the ref cookie and direct the user
-// back there.
+// back there. Make sure the path stored in the cookie makes it readable from the /ghlogin handler.
 func CurrentPassport(r *http.Request) (*Passport, error) {
 	session, _ := cookies.Get(r, "userauth")
 	email, ok := session.Values["email"].(string)
@@ -55,20 +55,19 @@ func CurrentPassport(r *http.Request) (*Passport, error) {
 // Service should be overridden by the client library. It can't be used
 // concurrently therefore it should be set during program initialization, or
 // sometime before it's used.
-var Service *oauth2.OAuth2Service
+var Service *oauth2.Config
 
 func handleAuthorize(w http.ResponseWriter, r *http.Request) {
 	if Service == nil {
 		http.Error(w, "Passport service not configured", http.StatusInternalServerError)
 		return
 	}
-	url := Service.GetAuthorizeURL("")
+	url := Service.AuthCodeURL("")
 	http.Redirect(w, r, url, http.StatusFound)
 }
 
 const (
-	apiBaseURL  = "https://api.github.com/"
-	apiEndPoint = "user"
+	apiEndPoint = "https://api.github.com/user"
 )
 
 func handleAuthToken(w http.ResponseWriter, r *http.Request) {
@@ -77,18 +76,14 @@ func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Passport service not configured", http.StatusInternalServerError)
 		return
 	}
-	token, err := Service.GetAccessToken(code)
+	token, err := Service.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		log.Printf("service token err %v, code %v", err, code)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	github := oauth2.Request(apiBaseURL, token.AccessToken)
-	github.AccessTokenInHeader = true
-	github.AccessTokenInHeaderScheme = "token"
-	github.AccessTokenInURL = true
-
+	github := Service.Client(oauth2.NoContext, token)
 	githubUserData, err := github.Get(apiEndPoint)
 	if err != nil {
 		log.Println("github get", err)
@@ -108,7 +103,9 @@ func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 
 	redirectTo := "/"
 	cookie, err := r.Cookie("ref")
-	if err == nil {
+	if err != nil {
+		log.Printf("could not fetch cookie: %v", err)
+	} else {
 		redirectTo = cookie.Value
 	}
 	log.Printf("Redirecting back to %v", redirectTo)
