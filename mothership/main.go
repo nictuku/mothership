@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"bitbucket.org/kisom/gopush/pushover"
+	humanize "github.com/dustin/go-humanize"
 	"github.com/gorilla/handlers"
 	"github.com/nictuku/mothership/cfg"
 	"github.com/nictuku/mothership/login"
@@ -38,7 +39,7 @@ const indexTemplate = `
 	<table>
 	<th>hostname</th><th>IP</th><th>Last seen</th>
 	{{range .}}
-	<tr><td><a href="ssh://{{ if .Username }}{{.Username}}@{{ end }}{{.IP}}:{{.SSHPort}}">{{.Hostname}}</a></td><td>{{.IP}}</td><td>{{with .Since}}{{.}} ago. {{end}}</td></tr>
+	<tr><td><a href="ssh://{{ if .Username }}{{.Username}}@{{ end }}{{.IP}}:{{.SSHPort}}">{{.Hostname}}</a></td><td>{{.IP}}</td><td>{{.Since}}</td></tr>
 	{{end}}
 	</table>
 </body>
@@ -56,8 +57,8 @@ type ServerInfo struct {
 	LastContact time.Time
 }
 
-func (s ServerInfo) Since() time.Duration {
-	return time.Since(s.LastContact)
+func (s ServerInfo) Since() string {
+	return humanize.Time(s.LastContact)
 }
 
 type serversInfo struct {
@@ -138,7 +139,7 @@ func staleCheck() {
 				}
 				// TODO: Alert the right user.
 				user := config.Users[0]
-				err := notify(user.PushoverDestination, fmt.Sprintf("Mothership: %q not seen for %v", server.Hostname, time.Since(server.LastContact)))
+				err := notify(user.PushoverDestination, fmt.Sprintf("Mothership: %q not seen for %v", server.Hostname, humanize.Time(server.LastContact)))
 				if err != nil {
 					fmt.Printf("Pushover notification error about host %q: %v\n", server.Hostname, err)
 					continue
