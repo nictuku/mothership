@@ -23,3 +23,9 @@ Agent installation:
 ```
 curl -sL https://raw.github.com/nictuku/mothership/master/agent/install.sh | bash -x
 ```
+
+To push fake data:
+
+```
+curl -X POST -F 'hostname=fake' -F 'sshPort=111' http://<mothership domain>/
+```
