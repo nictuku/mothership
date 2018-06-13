@@ -8,9 +8,9 @@ It has a single web page that lists servers, gives me a link to their SSH port a
 Installation:
 
 ```
-go get github.com/nictuku/mothership
+go get github.com/nictuku/mothership/mothership
 mkdir ~/.mothership
-cp "$(go env GOPATH)/src/github.com/nictuku/mothership/mothership.json" ~/.mothership
+cp "$(go env GOPATH)/src/github.com/nictuku/mothership/mothership/mothership.json" ~/.mothership
 ```
 
 Configuration:
