@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/kisom/gopush/pushover"
+	pushover "github.com/bdenning/go-pushover"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/gorilla/handlers"
 	"github.com/nictuku/mothership/cfg"
@@ -156,9 +156,10 @@ func staleCheck() {
 
 func notify(destination, message string) error {
 	// TODO: cache this.
-	pushauth := pushover.Authenticate(config.PushoverKey, destination)
-	if !pushover.Notify(pushauth, message) {
-		return fmt.Errorf("pushover notification failed.")
+	push := pushover.NewMessage(config.PushoverKey, destination)
+	r, err := push.Push(message)
+	if err != nil {
+		return fmt.Errorf("pushover notification failed: %v\n%#v", err, r)
 	}
 	return nil
 }
