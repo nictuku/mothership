@@ -1,11 +1,14 @@
 package login
 
-import "bitbucket.org/gosimple/oauth2"
+import (
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
+)
 
 func init() {
-	login.Service = &oauth2.Config{
-		ClientID:   clientId,
-		ClientSecret: clientSecret,
+	Service = &oauth2.Config{
+		ClientID:     "<something>",
+		ClientSecret: "<something>",
 		Scopes:       []string{"basic"},
 		Endpoint:     github.Endpoint,
 	}
