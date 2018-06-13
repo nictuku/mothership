@@ -25,7 +25,7 @@ var (
 )
 
 const (
-	username = "nictuku" // XXX
+	username = "yves" // XXX
 )
 
 const indexTemplate = `
