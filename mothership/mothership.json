@@ -1,0 +1,9 @@
+{
+  "PushoverKey": "pushkey",
+  "Users": [
+    {
+      "Email": "yves.junqueira@gmail.com",
+      "PushoverDestination": "<replace>"
+    }
+  ]
+}
