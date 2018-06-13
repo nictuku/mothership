@@ -32,7 +32,7 @@ var cookies = sessions.NewCookieStore(securecookie.GenerateRandomKey(64))
 
 type Passport struct {
 	Authorized bool
-	Email      string `email`
+	Login      string `login`
 }
 
 // CurrentPassword inspects cookies and finds if the user has been authenticated already. If so, the
@@ -45,11 +45,11 @@ type Passport struct {
 // back there. Make sure the path stored in the cookie makes it readable from the /ghlogin handler.
 func CurrentPassport(r *http.Request) (*Passport, error) {
 	session, _ := cookies.Get(r, "userauth")
-	email, ok := session.Values["email"].(string)
+	login, ok := session.Values["login"].(string)
 	if !ok {
 		return nil, fmt.Errorf("passport cookie not found")
 	}
-	return &Passport{Authorized: true, Email: email}, nil
+	return &Passport{Authorized: true, Login: login}, nil
 }
 
 // Service should be overridden by the client library. It can't be used
@@ -67,7 +67,7 @@ func handleAuthorize(w http.ResponseWriter, r *http.Request) {
 }
 
 const (
-	apiEndPoint = "https://api.github.com/user"
+	userApiEndPoint = "https://api.github.com/user"
 )
 
 func handleAuthToken(w http.ResponseWriter, r *http.Request) {
@@ -84,10 +84,10 @@ func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	github := Service.Client(oauth2.NoContext, token)
-	githubUserData, err := github.Get(apiEndPoint)
+	githubUserData, err := github.Get(userApiEndPoint)
 	if err != nil {
 		log.Println("github get", err)
-		http.Error(w, "github apiEndPoint get failure", http.StatusInternalServerError)
+		http.Error(w, "github userApiEndPoint get failure", http.StatusInternalServerError)
 		return
 	}
 	defer githubUserData.Body.Close()
@@ -97,14 +97,14 @@ func handleAuthToken(w http.ResponseWriter, r *http.Request) {
 		log.Println("parsePassport err:", err)
 	} else {
 		session, _ := cookies.Get(r, "userauth")
-		session.Values["email"] = passport.Email
+		session.Values["login"] = passport.Login
 		session.Save(r, w)
 	}
 
 	redirectTo := "/"
 	cookie, err := r.Cookie("ref")
 	if err != nil {
-		log.Printf("could not fetch cookie: %v", err)
+		log.Printf("could not fetch ref cookie: %v", err)
 	} else {
 		redirectTo = cookie.Value
 	}
@@ -121,7 +121,7 @@ func parsePassport(body io.ReadCloser) (*Passport, error) {
 		log.Println("passport json decoding:", err)
 		return nil, err
 	}
-	if len(passport.Email) > 0 {
+	if len(passport.Login) > 0 {
 		passport.Authorized = true
 	}
 	return &passport, nil

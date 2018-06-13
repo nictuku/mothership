@@ -39,7 +39,7 @@ type Config struct {
 }
 
 type User struct {
-	Email               string
+	Login               string
 	PushoverDestination string
 }
 

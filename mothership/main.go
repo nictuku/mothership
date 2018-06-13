@@ -109,7 +109,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	// TODO: Improve the user lookup.
 	foundUser := false
 	for _, user := range config.Users {
-		if user.Email == passport.Email {
+		if user.Login == passport.Login {
 			foundUser = true
 		}
 	}

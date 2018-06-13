@@ -2,7 +2,7 @@
   "PushoverKey": "pushkey",
   "Users": [
     {
-      "Email": "yves.junqueira@gmail.com",
+      "Login": "nictuku",
       "PushoverDestination": "<replace>"
     }
   ]
